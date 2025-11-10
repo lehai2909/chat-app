@@ -1,36 +1,41 @@
 import Message from "./Message";
-import Col from "react-bootstrap/Col";
-import Container from "react-bootstrap/Container";
-import {Row} from "react-bootstrap";
+import "./MessageList.css";
+import { useEffect, useRef } from "react";
 
-export default function MessageList({messages}) {
+export default function MessageList({ messages, user }) {
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  if (!messages || messages.length === 0) {
+    return (
+      <div className="message-list-empty">
+        <div className="empty-state">
+          <div className="empty-icon">💬</div>
+          <p className="empty-text">No messages yet</p>
+          <p className="empty-subtext">Start a conversation by typing a message below</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="message-list">
       {messages.map((msg, index) => (
-        <Message key={index} content={msg.content} sender={msg.sender} />
+        <Message 
+          key={index} 
+          content={msg.content} 
+          from={msg.from}
+          user={user}
+        />
       ))}
-
-      {/* <Container>
-        <Row>
-          <Col md="4">
-            <div className="chat-sidebar">
-              <h3>Contacts</h3>
-              <ul>
-                <li>Alice</li>
-                <li>Bob</li>
-                <li>Charlie</li>
-              </ul>
-            </div>
-          </Col>
-          <Col md="8">
-            <div className="chat-messages">
-              {messages.map((msg, index) => (
-                <Message key={index} content={msg.content} sender={msg.from} />
-              ))}
-            </div>
-          </Col>
-        </Row>
-      </Container> */}
+      <div ref={messagesEndRef} />
     </div>
   );
 }

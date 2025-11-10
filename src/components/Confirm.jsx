@@ -27,21 +27,32 @@ const Confirm = () => {
 
   return (
     <Container fluid className="form-signin">
-      <h2>Confirm your email</h2>
-      <Form>
-        <Form.Group className="mb-3" controlId="formBasicEmail">
+      <div className="login-container">
+        <div className="login-header">
+          <h2>Verify Your Email</h2>
+          <p>Enter the verification code sent to {email || "your email"}</p>
+        </div>
+        <Form className="login-form" onSubmit={handleSubmit}>
+          <Form.Group className="mb-3" controlId="formBasicCode">
+            <Form.Label>Verification Code</Form.Label>
           <Form.Control
             type="text"
-            placeholder="Verification Code"
+              placeholder="Enter verification code"
             value={confirmationCode}
             onChange={(e) => setConfirmationCode(e.target.value)}
+              required
+              maxLength={6}
           />
+            <Form.Text className="text-muted">
+              Check your email for the 6-digit verification code
+            </Form.Text>
         </Form.Group>
 
-        <Button variant="primary" onClick={handleSubmit}>
-          Confirm
+          <Button variant="primary" type="submit" className="btn-primary">
+            Verify Email
         </Button>
       </Form>
+      </div>
     </Container>
   );
 };

@@ -7,108 +7,108 @@ import { useState } from "react";
 import { loadMessages } from "../utils/loadMessages";
 import { putMessage } from "../utils/putMessage";
 import { jwtDecode } from "../utils/jwtDecode";
-// import { putMessageOnTopic } from "../utils/messageSync";
 
 const user = await jwtDecode(
   import.meta.env.VITE_USERPOOL_ID,
   import.meta.env.VITE_CLIENT_ID
 );
 
-console.log("Current User: " + user);
-
 export default function Chat() {
   if (!user) {
     sessionStorage.clear();
     window.location.href = "/login";
+    return null;
   }
+  
   const [messages, setMessages] = useState([]);
   const [chatTo, setChatTo] = useState("");
   const [inputValue, setInputValue] = useState("");
 
-  const handleSendMessage = () => {
-    if (inputValue.trim()) {
+  const handleSendMessage = async () => {
+    if (inputValue.trim() && chatTo.trim()) {
       const newMessage = {
         content: inputValue,
-        from: user, // Assuming "user" is the current user
+        from: user,
         to: chatTo,
       };
-      putMessage(newMessage);
-      // putMessageOnTopic(JSON.stringify(newMessage));
+      
+      try {
+        await putMessage(newMessage);
       setMessages([...messages, newMessage]);
       setInputValue("");
+      } catch (error) {
+        console.error("Error sending message:", error);
+        alert("Failed to send message. Please try again.");
+      }
     }
   };
 
   const handleChatFind = async () => {
     if (chatTo.trim()) {
-      // Logic to find and start chat with the specified user
+      try {
       console.log(`Starting chat with ${chatTo}`);
-      setMessages(await loadMessages(user, chatTo));
+        const loadedMessages = await loadMessages(user, chatTo);
+        setMessages(loadedMessages || []);
+      } catch (error) {
+        console.error("Error loading messages:", error);
+        alert("Failed to load messages. Please try again.");
+      }
     }
   };
 
   const handleKeyDown = (event) => {
-    event.key === "Enter" && handleSendMessage();
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSendMessage();
+    }
   };
 
-  // console.log("Access Token: " + sessionStorage.getItem("accessToken"));
-  // console.log("ID Token: " + sessionStorage.getItem("idToken"));
-
   return (
-    // <Container fluid>
-    // <div className="chat-header">
-    //   <h2>Chat Application</h2>
-    // </div>
-    //   <div className="chat-messages">
-    //     <MessageList messages={messages} />
-    //   </div>
-    // <div className="chat-to">
-    //   <input
-    //     type="text"
-    //     placeholder="Let's chat with..."
-    //     value={chatTo}
-    //     onChange={(e) => setChatTo(e.target.value)}
-    //   />
-    //   <button onClick={handleChatFind}>Let Chat!</button>
-    // </div>
-    // <div className="chat-input">
-    //   <input
-    //     type="text"
-    //     placeholder="Type a message..."
-    //     value={inputValue}
-    //     onChange={(e) => setInputValue(e.target.value)}
-    //     onKeyDown={handleKeyDown}
-    //   />
-    //   <button onClick={handleSendMessage}>Send</button>
-    // </div>
-    // </Container>
-    <Container fluid>
+    <Container fluid className="chat-container">
       <div className="chat-header">
-        <h2>Chat Application</h2>
+        <h2>💬 Chat Application</h2>
+        <p style={{ margin: "0.5rem 0 0 0", color: "var(--text-secondary)", fontSize: "0.95rem" }}>
+          Chatting as: <strong>{user}</strong>
+        </p>
       </div>
       <Row>
         <Col md="4" className="chat-contact-div">
+          <h3 style={{ marginBottom: "1rem", fontSize: "1.25rem", color: "var(--text-primary)" }}>
+            Start a Conversation
+          </h3>
           <div className="chat-to">
             <input
               type="text"
-              placeholder="Let's chat with..."
+              placeholder="Enter username to chat with..."
               value={chatTo}
               onChange={(e) => setChatTo(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleChatFind()}
             />
-            <button onClick={handleChatFind}>Let Chat!</button>
+            <button onClick={handleChatFind}>Start Chat</button>
           </div>
+          {chatTo && (
+            <p style={{ marginTop: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+              Chatting with: <strong>{chatTo}</strong>
+            </p>
+          )}
         </Col>
-        <Col md="6" className="chat-messages-div">
-          <MessageList messages={messages} />
+        <Col md="8" className="chat-messages-div">
+          <MessageList messages={messages} user={user} />
           <div className="chat-input">
             <input
               type="text"
-              placeholder="Type a message..."
+              placeholder="Type your message here..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
+              disabled={!chatTo}
             />
-            <button onClick={handleSendMessage}>Send</button>
+            <button 
+              onClick={handleSendMessage} 
+              disabled={!chatTo || !inputValue.trim()}
+            >
+              Send
+            </button>
           </div>
         </Col>
       </Row>

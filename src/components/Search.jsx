@@ -1,57 +1,47 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
-import {
-  AuthFlowType,
-  CognitoIdentityProviderClient,
-  InitiateAuthCommand,
-} from "@aws-sdk/client-cognito-identity-provider";
 import "./Login.css";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
-import axios from "axios";
+import { logService } from "../utils/logService";
 
 function Search() {
   const [keyword, setKeyword] = useState("");
 
   async function handleSearch(event) {
     event.preventDefault();
-    // await initiateAuth({
-    //   username: email,
-    //   password: password,
-    //   clientId: import.meta.env.VITE_CLIENT_ID,
-    // });
     console.log("Searching for: " + keyword);
-
-    await axios
-      .post()
-      .then(function (response) {})
-      .catch(function (error) {
-        console.log(error);
-      });
-    // await userNotify(email);
-    if (sessionStorage.getItem("accessToken")) {
-      // window.location.href = "/chat";
-    }
+    logService();
+    // TODO: Implement search functionality
   }
 
   return (
-    <Container fluid className="form-search">
-      <Form onSubmit={handleSearch} className="search-form">
+    <Container fluid className="form-signin">
+      <div className="login-container">
+        <div className="login-header">
+          <h2>🔍 Search</h2>
+          <p>Find messages, users, or conversations</p>
+        </div>
+        <Form onSubmit={handleSearch} className="login-form">
         <Form.Group className="mb-3" controlId="formBasicSearch">
-          <Form.Label>Search</Form.Label>
+            <Form.Label>Search Keyword</Form.Label>
           <Form.Control
             type="text"
-            placeholder="Enter search keyword"
+              placeholder="Enter search keyword..."
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
+              required
           />
+            <Form.Text className="text-muted">
+              Search through your messages and contacts
+            </Form.Text>
         </Form.Group>
 
-        <Button variant="primary" type="submit">
+          <Button variant="primary" type="submit" className="btn-primary">
           Search
         </Button>
       </Form>
+      </div>
     </Container>
   );
 }
