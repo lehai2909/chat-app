@@ -3,7 +3,7 @@ import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import "./Login.css";
 import { useState } from "react";
-import { logService } from "../utils/logService";
+import { callSearchService } from "../utils/searchService";
 
 function Search() {
   const [keyword, setKeyword] = useState("");
@@ -11,7 +11,7 @@ function Search() {
   async function handleSearch(event) {
     event.preventDefault();
     console.log("Searching for: " + keyword);
-    logService();
+    callSearchService();
     // TODO: Implement search functionality
   }
 
@@ -23,24 +23,24 @@ function Search() {
           <p>Find messages, users, or conversations</p>
         </div>
         <Form onSubmit={handleSearch} className="login-form">
-        <Form.Group className="mb-3" controlId="formBasicSearch">
+          <Form.Group className="mb-3" controlId="formBasicSearch">
             <Form.Label>Search Keyword</Form.Label>
-          <Form.Control
-            type="text"
+            <Form.Control
+              type="text"
               placeholder="Enter search keyword..."
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
               required
-          />
+            />
             <Form.Text className="text-muted">
               Search through your messages and contacts
             </Form.Text>
-        </Form.Group>
+          </Form.Group>
 
           <Button variant="primary" type="submit" className="btn-primary">
-          Search
-        </Button>
-      </Form>
+            Search
+          </Button>
+        </Form>
       </div>
     </Container>
   );
