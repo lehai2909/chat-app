@@ -40,6 +40,8 @@ function Login() {
         );
         // Update state to trigger re-render and show welcome message
         setIsLoggedIn(true);
+      } else {
+        alert("Login failed: " + (response.data.error || "Unknown error"));
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -72,7 +74,7 @@ function Login() {
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Email address</Form.Label>
               <Form.Control
-                type="email"
+                type="input"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

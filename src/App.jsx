@@ -4,7 +4,9 @@ import Login from "./components/Login";
 import Chat from "./components/Chat";
 import Confirm from "./components/Confirm";
 import Search from "./components/Search";
+import Results from "./components/Results";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import LiveComponent from "./components/LiveComponent";
 
 function App() {
   const isAuthenticated = () => {
@@ -18,6 +20,7 @@ function App() {
         <Route path="/confirm" element={<Confirm />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/results" element={<Results />} />
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route
           path="/chat"
@@ -25,6 +28,7 @@ function App() {
             isAuthenticated() ? <Chat /> : <Navigate to="/login" replace />
           }
         />
+        <Route path="/live" element={<LiveComponent />} />
       </Routes>
     </BrowserRouter>
   );

@@ -3,16 +3,30 @@ import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import "./Login.css";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { callSearchService } from "../utils/searchService";
 
 function Search() {
   const [keyword, setKeyword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   async function handleSearch(event) {
     event.preventDefault();
     console.log("Searching for: " + keyword);
-    callSearchService();
-    // TODO: Implement search functionality
+    setError(null);
+    setLoading(true);
+    try {
+      const resp = await callSearchService(keyword, { size: 50 });
+      // Navigate to results page and pass results via location state
+      navigate("/results", { state: { results: resp, keyword } });
+    } catch (err) {
+      console.error(err);
+      setError(err.message || String(err));
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -38,8 +52,9 @@ function Search() {
           </Form.Group>
 
           <Button variant="primary" type="submit" className="btn-primary">
-            Search
+            {loading ? "Searching..." : "Search"}
           </Button>
+          {error && <div style={{ color: "red", marginTop: 8 }}>{error}</div>}
         </Form>
       </div>
     </Container>

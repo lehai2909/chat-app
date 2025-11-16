@@ -1,31 +1,27 @@
 import axios from "axios";
 
-export async function callSearchService() {
-  const resp = await axios.post("http://localhost:3000/search-lib", {
-    keyword: "t-shirt",
-  });
-  console.log(resp.data.hits.hits);
+/**
+ * Call backend search library which returns OpenSearch hits.
+ * The backend is expected to return an OpenSearch-style payload where
+ * the array of documents is at resp.data.hits.hits. This function
+ * returns that array directly.
+ *
+ * @param {string} keyword
+ * @returns {Promise<Array>} array of hit objects (each usually contains _source)
+ */
+export async function callSearchService(keyword) {
+  try {
+    // Request 20 items from the backend so it returns a limited set
+    const resp = await axios.post("http://localhost:3000/search-lib", {
+      keyword,
+      size: 20,
+    });
+    // Expect resp.data.hits.hits to be an array of documents; return only 20
+    return (resp?.data?.hits?.hits || []).slice(0, 20);
+  } catch (err) {
+    const details = err?.response?.data ?? err?.message ?? err;
+    throw new Error(
+      `Search backend request failed: ${JSON.stringify(details)}`
+    );
+  }
 }
-
-//http://localhost:9200/_cluster/health
-// const url = "http://localhost:9200/ecommmerce/_search";
-// const body = {
-//   query: {
-//     match: {
-//       "products.product_name": "t-shirt",
-//     },
-//   },
-// };
-
-//   try {
-//     const resp = await axios.get(url, body, {
-//       headers: { "Content-Type": "application/json" },
-//     });
-//     // Return the full response data so callers can inspect hits, total, etc.
-//     console.log(resp.data);
-//   } catch (err) {
-//     // Normalize error message and rethrow for caller handling
-//     const details = err?.response?.data ?? err?.message ?? err;
-//     throw new Error(`OpenSearch request failed: ${JSON.stringify(details)}`);
-//   }
-// }
