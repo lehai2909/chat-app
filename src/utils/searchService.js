@@ -12,7 +12,7 @@ import axios from "axios";
 export async function callSearchService(keyword) {
   try {
     // Request 20 items from the backend so it returns a limited set
-    const resp = await axios.post("http://localhost:3000/search-lib", {
+    const resp = await axios.post("http://localhost:3000/search", {
       keyword,
       size: 20,
     });

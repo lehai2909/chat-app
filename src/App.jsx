@@ -6,6 +6,8 @@ import Confirm from "./components/Confirm";
 import Search from "./components/Search";
 import Results from "./components/Results";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+
+//For testing chat app using web socket
 import LiveComponent from "./components/LiveComponent";
 
 function App() {

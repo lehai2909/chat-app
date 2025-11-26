@@ -18,7 +18,7 @@ function Search() {
     setError(null);
     setLoading(true);
     try {
-      const resp = await callSearchService(keyword, { size: 50 });
+      const resp = await callSearchService(keyword);
       // Navigate to results page and pass results via location state
       navigate("/results", { state: { results: resp, keyword } });
     } catch (err) {
