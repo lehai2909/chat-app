@@ -6,6 +6,7 @@ function LiveComponent() {
   const [ws, setWs] = useState(null);
   const [userId, setUserId] = useState("");
   const [messageText, setMessageText] = useState("");
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     // Initialize WebSocket connection
@@ -24,6 +25,13 @@ function LiveComponent() {
 
     webSocketRef.on("users", (data) => {
       console.log("Active users:", data);
+      setUsers(data);
+    });
+
+    webSocketRef.on("user connected", (data) => {
+      console.log("User connected:", data);
+      setUsers([...users, data]);
+      console.log("All users:", users);
     });
 
     webSocketRef.on("private message", ({ content, from }) => {
@@ -56,6 +64,14 @@ function LiveComponent() {
   return (
     <div className="live-container">
       <h1 className="live-title">💬 Live Chat</h1>
+      <div className="live-users-container">
+        <h2 className="live-users-title">Active Users:</h2>
+        <ul>
+          {users.map((user) => (
+            <li>{user.userID}</li>
+          ))}
+        </ul>
+      </div>
       <div className="live-input-container">
         <input
           type="text"
