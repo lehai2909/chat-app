@@ -96,3 +96,35 @@
   font-size: 16px;
   font-style: italic;
 }
+
+.live-users-container {
+  margin-bottom: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,250,250,0.9));
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.live-users-title {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.live-users-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.live-users-list li {
+  padding: 6px 10px;
+  background: #f1f3f5;
+  border-radius: 999px;
+  font-size: 13px;
+  color: #34495e;
+}

@@ -6,6 +6,7 @@ const io = new Server({
 
 io.on("connection", (socket) => {
   console.log("a user connected");
+  console.log("Socket handshake:", socket.handshake);
   socket.on("chat message", (msg) => {
     console.log("message: " + msg);
     io.emit("message", msg);
@@ -31,11 +32,11 @@ io.on("connection", (socket) => {
     username: socket.username,
   });
 
-  socket.on("private message", ({ userId, text }) => {
-    console.log(`Private message from ${socket.id} to ${userId}: ${text}`);
-    socket.to(userId).emit("private message", {
+  socket.on("private message", ({ from, to, text }) => {
+    console.log(`Private message from ${from} to ${to}: ${text}`);
+    socket.to(to).emit("private message", {
       content: text,
-      from: socket.id,
+      from: from,
     });
   });
 });

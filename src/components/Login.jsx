@@ -78,6 +78,16 @@ function Login() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (isSignUp) {
+                      handleSignUp(e);
+                    } else {
+                      handleLogin(e);
+                    }
+                  }
+                }}
                 required
               />
               <Form.Text className="text-muted">
@@ -92,6 +102,16 @@ function Login() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (isSignUp) {
+                      handleSignUp(e);
+                    } else {
+                      handleLogin(e);
+                    }
+                  }
+                }}
                 required
               />
             </Form.Group>

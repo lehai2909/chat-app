@@ -5,12 +5,14 @@ function LiveComponent() {
   const [message, setMessage] = useState(null);
   const [ws, setWs] = useState(null);
   const [userId, setUserId] = useState("");
+  const [currentUserId, setCurrentUserId] = useState("");
   const [messageText, setMessageText] = useState("");
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
     // Initialize WebSocket connection
     const webSocketRef = io("http://localhost:3000", {
+      auth: { token: "my-secret-token" },
       transports: ["websocket"],
     });
 
@@ -25,13 +27,12 @@ function LiveComponent() {
 
     webSocketRef.on("users", (data) => {
       console.log("Active users:", data);
-      setUsers(data);
+      setUsers(data || []);
     });
 
     webSocketRef.on("user connected", (data) => {
       console.log("User connected:", data);
-      setUsers([...users, data]);
-      console.log("All users:", users);
+      setUsers((prev) => [...prev, data]);
     });
 
     webSocketRef.on("private message", ({ content, from }) => {
@@ -55,8 +56,13 @@ function LiveComponent() {
   }, []); // Empty dependency array ensures effect runs only once on mount
 
   const handleSendMessage = () => {
-    if (ws && userId && messageText) {
-      ws.emit("private message", { userId, text: messageText });
+    // require websocket, sender id, receiver id and message text
+    if (ws && currentUserId && userId && messageText) {
+      ws.emit("private message", {
+        from: currentUserId,
+        to: userId,
+        text: messageText,
+      });
       setMessageText("");
     }
   };
@@ -75,7 +81,14 @@ function LiveComponent() {
       <div className="live-input-container">
         <input
           type="text"
-          placeholder="Enter User ID"
+          placeholder="Current User ID"
+          value={currentUserId}
+          onChange={(e) => setCurrentUserId(e.target.value)}
+          className="live-input"
+        />
+        <input
+          type="text"
+          placeholder="Receiver User ID"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
           className="live-input"

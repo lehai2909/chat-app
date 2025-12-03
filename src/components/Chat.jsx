@@ -21,12 +21,12 @@ export default function Chat() {
     return null;
   }
 
-  useEffect(() => {
-    const socket = io("http://localhost:3000", { transports: ["websocket"] });
-    socket.on("connect", () => {
-      console.log("Connected to server. id=" + socket.id);
-    });
-  });
+  // useEffect(() => {
+  //   const socket = io("http://localhost:3000", { transports: ["websocket"] });
+  //   socket.on("connect", () => {
+  //     console.log("Connected to server. id=" + socket.id);
+  //   });
+  // });
 
   const [messages, setMessages] = useState([]);
   const [chatTo, setChatTo] = useState("");
