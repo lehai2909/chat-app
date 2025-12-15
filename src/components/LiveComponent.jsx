@@ -1,18 +1,21 @@
 import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import "./LiveComponent.css";
+import { jwtDecode } from "../utils/jwtDecode";
+
 function LiveComponent() {
   const [message, setMessage] = useState(null);
   const [ws, setWs] = useState(null);
-  const [userId, setUserId] = useState("");
-  const [currentUserId, setCurrentUserId] = useState("");
+  const [receiveUserId, setReceiveUserId] = useState("");
   const [messageText, setMessageText] = useState("");
   const [users, setUsers] = useState([]);
 
+  const username = sessionStorage.getItem("username") || "Guest";
   useEffect(() => {
     // Initialize WebSocket connection
+
     const webSocketRef = io("http://localhost:3000", {
-      auth: { token: "my-secret-token" },
+      auth: { username: username },
       transports: ["websocket"],
     });
 
@@ -35,8 +38,13 @@ function LiveComponent() {
       setUsers((prev) => [...prev, data]);
     });
 
-    webSocketRef.on("private message", ({ content, from }) => {
-      console.log("Private message from", from + ":", content);
+    webSocketRef.on("user disconnected", (data) => {
+      console.log("User disconnected:", data);
+      setUsers((prev) => prev.filter((user) => user.userID != data));
+    });
+
+    webSocketRef.on("private message", ({ content, from, to }) => {
+      console.log("Private message from ", from + "to: " + to + ": ", content);
     });
 
     webSocketRef.on("disconnect", () => {
@@ -57,10 +65,10 @@ function LiveComponent() {
 
   const handleSendMessage = () => {
     // require websocket, sender id, receiver id and message text
-    if (ws && currentUserId && userId && messageText) {
+    if (ws && receiveUserId && messageText) {
       ws.emit("private message", {
-        from: currentUserId,
-        to: userId,
+        from: username,
+        to: receiveUserId,
         text: messageText,
       });
       setMessageText("");
@@ -74,7 +82,7 @@ function LiveComponent() {
         <h2 className="live-users-title">Active Users:</h2>
         <ul>
           {users.map((user) => (
-            <li>{user.userID}</li>
+            <li key={user.username}>{user.username}</li>
           ))}
         </ul>
       </div>
@@ -82,15 +90,15 @@ function LiveComponent() {
         <input
           type="text"
           placeholder="Current User ID"
-          value={currentUserId}
-          onChange={(e) => setCurrentUserId(e.target.value)}
+          value={username}
+          // onChange={(e) => setCurrentUserId(e.target.value)}
           className="live-input"
         />
         <input
           type="text"
           placeholder="Receiver User ID"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
+          value={receiveUserId}
+          onChange={(e) => setReceiveUserId(e.target.value)}
           className="live-input"
         />
         <input

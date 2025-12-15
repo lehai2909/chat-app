@@ -53,7 +53,7 @@ function Search() {
           query: keyword,
         }
       );
-      console.log("Search history updated:", response.data);
+      // console.log("Search history updated:", response.data);
     } catch (err) {
       console.error(err);
       setError(

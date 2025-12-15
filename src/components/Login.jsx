@@ -29,6 +29,7 @@ function Login() {
       );
 
       if (response.data.auth) {
+        sessionStorage.setItem("username", email);
         sessionStorage.setItem("idToken", response.data.auth.IdToken || "");
         sessionStorage.setItem(
           "accessToken",

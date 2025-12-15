@@ -21,16 +21,10 @@ export default function Chat() {
     return null;
   }
 
-  // useEffect(() => {
-  //   const socket = io("http://localhost:3000", { transports: ["websocket"] });
-  //   socket.on("connect", () => {
-  //     console.log("Connected to server. id=" + socket.id);
-  //   });
-  // });
-
   const [messages, setMessages] = useState([]);
   const [chatTo, setChatTo] = useState("");
   const [inputValue, setInputValue] = useState("");
+  const [ws, setWs] = useState(null);
 
   const handleSendMessage = async () => {
     if (inputValue.trim() && chatTo.trim()) {
@@ -42,7 +36,19 @@ export default function Chat() {
 
       try {
         await putMessage(newMessage);
-        setMessages([...messages, newMessage]);
+        setMessages((prev) => [...prev, newMessage]);
+        // emit private message over websocket so receiver can append in real-time
+        try {
+          ws &&
+            ws.emit &&
+            ws.emit("private message", {
+              from: user,
+              to: chatTo,
+              text: inputValue,
+            });
+        } catch (e) {
+          console.warn("Socket emit failed:", e);
+        }
         setInputValue("");
       } catch (error) {
         console.error("Error sending message:", error);
@@ -50,6 +56,68 @@ export default function Chat() {
       }
     }
   };
+
+  useEffect(() => {
+    // create socket connection for chat (separate from LiveComponent)
+    try {
+      const webSocketRef = io("http://localhost:3000", {
+        auth: { username: user },
+        transports: ["websocket"],
+      });
+      setWs(webSocketRef);
+
+      webSocketRef.on("connect", () => {
+        console.log("Chat socket connected");
+      });
+
+      webSocketRef.on("private message", (msg) => {
+        // append incoming private messages when current user is the recipient
+        try {
+          if (msg) {
+            const appended = {
+              content: msg.text ?? msg.content,
+              from: msg.from,
+              to: msg.to,
+            };
+            setMessages((prev) => {
+              // simple de-duplication: check if same content/from/to already exists
+              const exists = prev.some(
+                (m) =>
+                  m.content === appended.content &&
+                  m.from === appended.from &&
+                  m.to === appended.to
+              );
+              if (exists) return prev;
+              return [...prev, appended];
+            });
+          }
+        } catch (e) {
+          console.error("Error handling incoming private message:", e);
+        }
+      });
+
+      webSocketRef.on("disconnect", () => {
+        console.log("Chat socket disconnected");
+      });
+    } catch (err) {
+      console.error("Failed to create chat socket:", err);
+    }
+
+    return () => {
+      if (ws) {
+        try {
+          ws.removeAllListeners && ws.removeAllListeners();
+        } catch (e) {
+          /* ignore */
+        }
+        try {
+          ws.close && ws.close();
+        } catch (e) {
+          /* ignore */
+        }
+      }
+    };
+  }, [user]);
 
   const handleChatFind = async () => {
     if (chatTo.trim()) {
