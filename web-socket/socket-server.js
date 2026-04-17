@@ -6,7 +6,7 @@ const io = new Server({
 
 io.on("connection", (socket) => {
   console.log("a user connected");
-  console.log("Socket handshake:", socket.handshake);
+  // console.log("Socket handshake:", socket.handshake);
   socket.on("chat message", (msg) => {
     console.log("message: " + msg);
     io.emit("message", msg);
@@ -21,15 +21,14 @@ io.on("connection", (socket) => {
   const users = [];
   for (let [id, socket] of io.of("/").sockets) {
     users.push({
-      userID: id,
-      username: socket.username,
+      // userID: id,
+      username: socket.handshake.auth.username,
     });
   }
   console.log(users);
   socket.emit("users", users);
   socket.broadcast.emit("user connected", {
-    userID: socket.id,
-    username: socket.username,
+    username: socket.handshake.auth.username,
   });
 
   socket.on("private message", ({ from, to, text }) => {

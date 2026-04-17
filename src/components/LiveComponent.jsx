@@ -13,7 +13,13 @@ function LiveComponent() {
   const username = sessionStorage.getItem("username") || "Guest";
   useEffect(() => {
     // Initialize WebSocket connection
-
+    // const username = jwtDecode(
+    //   import.meta.env.VITE_USERPOOL_ID,
+    //   import.meta.env.VITE_CLIENT_ID
+    // ).then((username) => {
+    //   console.log("Decoded username:", username);
+    // });
+    console.log("Username for WebSocket:", username);
     const webSocketRef = io("http://localhost:3000", {
       auth: { username: username },
       transports: ["websocket"],
@@ -90,7 +96,7 @@ function LiveComponent() {
         <input
           type="text"
           placeholder="Current User ID"
-          value={username}
+          // value={username}
           // onChange={(e) => setCurrentUserId(e.target.value)}
           className="live-input"
         />
