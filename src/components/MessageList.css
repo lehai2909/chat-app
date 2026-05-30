@@ -1,0 +1,78 @@
+.message-list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 400px;
+  max-height: 600px;
+  width: 100%;
+}
+
+.message-list-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  max-height: 600px;
+  padding: 2rem;
+  width: 100%;
+  overflow: hidden;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.empty-subtext {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+/* Scrollbar styling for message list */
+.message-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.message-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.message-list::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+}
+
+.message-list::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .message-list {
+    padding: 1rem;
+    min-height: 300px;
+    max-height: 500px;
+  }
+  
+  .empty-icon {
+    font-size: 3rem;
+  }
+}
+

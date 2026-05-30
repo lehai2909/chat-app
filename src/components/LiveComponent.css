@@ -1,0 +1,130 @@
+.live-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  min-height: 100vh;
+}
+
+.live-title {
+  text-align: center;
+  font-size: 32px;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+.live-input-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.live-input {
+  flex: 1;
+  min-width: 150px;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.live-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.live-button {
+  padding: 12px 28px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.live-button:hover {
+  background-color: #0056b3;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+}
+
+.live-button:active {
+  transform: scale(0.98);
+}
+
+.live-data-container {
+  background-color: white;
+  padding: 24px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.live-data-title {
+  font-size: 18px;
+  color: #2c3e50;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.live-data-box {
+  background-color: #f5f5f5;
+  padding: 16px;
+  border-radius: 6px;
+  overflow: auto;
+  max-height: 400px;
+  border: 1px solid #e0e0e0;
+  font-size: 13px;
+  font-family: 'Monaco', 'Courier New', monospace;
+  color: #333;
+  margin: 0;
+}
+
+.live-waiting-text {
+  text-align: center;
+  color: #7f8c8d;
+  font-size: 16px;
+  font-style: italic;
+}
+
+.live-users-container {
+  margin-bottom: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,250,250,0.9));
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.live-users-title {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.live-users-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.live-users-list li {
+  padding: 6px 10px;
+  background: #f1f3f5;
+  border-radius: 999px;
+  font-size: 13px;
+  color: #34495e;
+}
