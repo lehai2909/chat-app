@@ -1,33 +1,46 @@
-# syntax=docker/dockerfile:1
+# =========================================
+# Stage 1: Build the React.js Application
+# =========================================
+ARG NODE_VERSION=24.12.0-alpine
+ARG NGINX_VERSION=alpine3.22
 
-# syntax=docker/dockerfile:1
+# Use a lightweight Node.js image for building (customizable via ARG)
+FROM node:${NODE_VERSION} AS builder
 
-FROM node:23-alpine as build
-
+# Set the working directory inside the container
 WORKDIR /app
 
-# Install dependencies
-COPY package.json package-lock.json ./
+# Copy package-related files first to leverage Docker's caching mechanism
+COPY package.json package-lock.json* ./
 
-RUN npm install
+# Install project dependencies using npm ci (ensures a clean, reproducible install)
+RUN --mount=type=cache,target=/root/.npm npm ci
 
-# Copy source and build
+# Copy the rest of the application source code into the container
 COPY . .
 
+# Build the React.js application (outputs to /app/dist)
 RUN npm run build
 
-# Step 2: Serve the app using Nginx
-FROM nginx:alpine
+# =========================================
+# Stage 2: Prepare Nginx to Serve Static Files
+# =========================================
 
-# Remove default Nginx static assets
-RUN rm -rf /usr/share/nginx/html/*
+FROM nginxinc/nginx-unprivileged:${NGINX_VERSION} AS runner
 
-# Copy built React files
-COPY --from=build /app/dist /usr/share/nginx/html
+# Copy custom Nginx config
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Optional: custom Nginx config (for SPA routing)
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy the static build output from the build stage to Nginx's default HTML serving directory
+COPY --chown=nginx:nginx --from=builder /app/dist /usr/share/nginx/html
 
-EXPOSE 80
+# Use a built-in non-root user for security best practices
+USER nginx
 
-CMD ["nginx", "-g", "daemon off;"]
+# Expose port 8080 to allow HTTP traffic
+# Note: The default NGINX container now listens on port 8080 instead of 80
+EXPOSE 8080
+
+# Start Nginx directly with custom config
+ENTRYPOINT ["nginx", "-c", "/etc/nginx/nginx.conf"]
+CMD ["-g", "daemon off;"]

@@ -7,7 +7,6 @@ import { useState, useEffect } from "react";
 import { loadMessages } from "../utils/loadMessages";
 import { putMessage } from "../utils/putMessage";
 import { jwtDecode } from "../utils/jwtDecode";
-import { io } from "socket.io-client";
 
 const user = await jwtDecode(
   import.meta.env.VITE_USERPOOL_ID,
@@ -39,13 +38,17 @@ export default function Chat() {
         setMessages((prev) => [...prev, newMessage]);
         // emit private message over websocket so receiver can append in real-time
         try {
-          ws &&
-            ws.emit &&
-            ws.emit("private message", {
-              from: user,
-              to: chatTo,
-              text: inputValue,
-            });
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(
+              JSON.stringify({
+                type: "message",
+                from: user,
+                to: chatTo,
+                content: inputValue,
+                msgType: "text",
+              })
+            );
+          }
         } catch (e) {
           console.warn("Socket emit failed:", e);
         }
@@ -57,67 +60,63 @@ export default function Chat() {
     }
   };
 
-  // useEffect(() => {
-  //   // create socket connection for chat (separate from LiveComponent)
-  //   try {
-  //     const webSocketRef = io("http://localhost:3000", {
-  //       auth: { username: user },
-  //       transports: ["websocket"],
-  //     });
-  //     setWs(webSocketRef);
+  useEffect(() => {
+    let activeWs = null;
+    try {
+      const wsUrl = import.meta.env.VITE_WEBSOCKET_URL || "ws://localhost:8080";
+      console.log("Connecting to WebSocket:", wsUrl);
+      activeWs = new WebSocket(wsUrl);
+      setWs(activeWs);
 
-  //     webSocketRef.on("connect", () => {
-  //       console.log("Chat socket connected");
-  //     });
+      activeWs.onopen = () => {
+        console.log("Chat socket connected");
+        activeWs.send(
+          JSON.stringify({ type: "login", username: user, avatar: null })
+        );
+      };
 
-  //     webSocketRef.on("private message", (msg) => {
-  //       // append incoming private messages when current user is the recipient
-  //       try {
-  //         if (msg) {
-  //           const appended = {
-  //             content: msg.text ?? msg.content,
-  //             from: msg.from,
-  //             to: msg.to,
-  //           };
-  //           setMessages((prev) => {
-  //             // simple de-duplication: check if same content/from/to already exists
-  //             const exists = prev.some(
-  //               (m) =>
-  //                 m.content === appended.content &&
-  //                 m.from === appended.from &&
-  //                 m.to === appended.to
-  //             );
-  //             if (exists) return prev;
-  //             return [...prev, appended];
-  //           });
-  //         }
-  //       } catch (e) {
-  //         console.error("Error handling incoming private message:", e);
-  //       }
-  //     });
+      activeWs.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === "receive_message") {
+            setMessages((prev) => {
+              const appended = {
+                content: data.content,
+                from: data.from,
+                to: data.to,
+              };
+              const exists = prev.some(
+                (m) =>
+                  m.content === appended.content &&
+                  m.from === appended.from &&
+                  m.to === appended.to
+              );
+              if (exists) return prev;
+              return [...prev, appended];
+            });
+          }
+        } catch (e) {
+          console.error("Error parsing message:", e);
+        }
+      };
 
-  //     webSocketRef.on("disconnect", () => {
-  //       console.log("Chat socket disconnected");
-  //     });
-  //   } catch (err) {
-  //     console.error("Failed to create chat socket:", err);
-  //   }
+      activeWs.onclose = () => {
+        console.log("Chat socket disconnected");
+      };
 
-  //   return () => {
-  //     if (ws) {
-  //       try {
-  //         ws.removeAllListeners && ws.removeAllListeners();
-  //       } catch (e) {
-  //         /* ignore */
-  //       }
-  //       try {
-  //         ws.close && ws.close();
-  //       } catch (e) {
-  //         /* ignore */
-  //       }
-  //     }
-  //   };
-  // }, [user]);
+      activeWs.onerror = (err) => {
+        console.error("WebSocket error:", err);
+      };
+    } catch (err) {
+      console.error("Failed to create chat socket:", err);
+    }
+
+    return () => {
+      if (activeWs) {
+        activeWs.close();
+      }
+    };
+  }, [user]);
 
   const handleChatFind = async () => {
     if (chatTo.trim()) {

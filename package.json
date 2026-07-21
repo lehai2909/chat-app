@@ -10,9 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.901.0",
-    "@aws-sdk/client-dynamodb": "^3.902.0",
-    "@aws-sdk/credential-providers": "^3.901.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.972.0",
+    "@aws-sdk/client-dynamodb": "^3.972.0",
+    "@aws-sdk/credential-providers": "^3.972.0",
     "@confluentinc/kafka-javascript": "^1.6.0",
     "@opensearch-project/opensearch": "^3.5.1",
     "aws-jwt-verify": "^5.1.1",
